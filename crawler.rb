@@ -15,12 +15,6 @@ begin
 	page = Nokogiri::HTML(open(tieba_url, 'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.107 Safari/537.36'))
 	puts "打开: " + tieba_url
 
-	tieba_url = nil
-	tieba_pagings = page.css('#frs_list_pager a')
-	tieba_pagings.each do |tieba_paging|
-		tieba_url = tieba_paging.attributes['href'].value if tieba_paging.children.text == '下一页'
-	end
-	
 	#List article
 	articles = page.css('.threadlist_text.threadlist_title a')
 	articles.each do |article|
@@ -73,11 +67,13 @@ begin
 
 		end while !article_url.nil?
 	end
-	break
-	puts "===================================================="
-	puts tieba_url + "         " + page_depth.to_s
-	puts tieba_url.end_with? "pn=" + page_depth.to_s
-	puts "===================================================="
+
+	tieba_url = nil
+	tieba_pagings = page.css('#frs_list_pager a')
+	tieba_pagings.each do |tieba_paging|
+		tieba_url = tieba_paging.attributes['href'].value if tieba_paging.children.text == '下一页'
+	end
+	
 	break if tieba_url.nil? or ( page_depth != -1 and tieba_url.end_with? "pn=" + page_depth.to_s )
 
 end while !tieba_url.nil?
